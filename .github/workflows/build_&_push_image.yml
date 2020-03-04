@@ -1,0 +1,21 @@
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  deploy-container:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+
+    # These creds are used to push your new image
+    - uses: azure/container-actions/docker-login@master
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    # Tag the image with the git commit hash
+    - run: |
+        docker build . -t jasonfreeberg/static-html:${{ github.sha }}
+        docker push jasonfreeberg/static-html:${{ github.sha }}
